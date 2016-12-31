@@ -1,0 +1,6 @@
+d:\docs\program files\Projects\MorskoyBoy\MorskoyBoy\bin\Debug\MorskoyBoy.exe.config
+d:\docs\program files\Projects\MorskoyBoy\MorskoyBoy\bin\Debug\MorskoyBoy.exe
+d:\docs\program files\Projects\MorskoyBoy\MorskoyBoy\bin\Debug\MorskoyBoy.pdb
+d:\docs\program files\Projects\MorskoyBoy\MorskoyBoy\obj\Debug\MorskoyBoy.csprojResolveAssemblyReference.cache
+d:\docs\program files\Projects\MorskoyBoy\MorskoyBoy\obj\Debug\MorskoyBoy.exe
+d:\docs\program files\Projects\MorskoyBoy\MorskoyBoy\obj\Debug\MorskoyBoy.pdb

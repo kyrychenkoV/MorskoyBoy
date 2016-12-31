@@ -8,26 +8,10 @@ using System.Threading.Tasks;
 
 namespace MorskoyBoy
 {
-	public enum DrowDisplay //: short
-	{
-		EMPTY = 0,
-		SHOT,
-		STRIKE,
-		KILL,
-		SHIP,
-	}
-
-	enum StateGameEnum
-	{
-		INIZIALIZATE = 0,
-		DRAW,
-		PROCESING,
-		EXIT
-	}
-
 
 	class Screan
 	{
+
 		private char[,] display =
 		{
 			{
@@ -93,23 +77,42 @@ namespace MorskoyBoy
 			'$' //SHIP,
 		};
 
+		public enum DrowDisplay
+		{
+			EMPTY = 0,
+			SHOT,
+			STRIKE,
+			KILL,
+			SHIP,
+		}
+
+		enum StateGameEnum
+		{
+			INIZIALIZATE = 0,
+			DRAW,
+			PROCESING,
+			EXIT
+		}
+
+
 		StateGameEnum one = StateGameEnum.INIZIALIZATE;
 
 		private DrowDisplay[,] player1 = new DrowDisplay[10, 10];
 		private DrowDisplay[,] player2 = new DrowDisplay[10, 10];
+		private DrowDisplay[,] fieldTargetPlayer1 = new DrowDisplay[10, 10];
+		private DrowDisplay[,] fieldTargetPlayer2 = new DrowDisplay[10, 10];
 
 		private int numberPlayer = 1;
 		private char target = '+';
-
-		public int x=0;
-		public int y=0;
 
 		public char[] DrowSymbol
 		{
 			get { return drowSymbol; }
 		}
 
-		public void DrowField(DrowDisplay[,] player, int x,int y)
+		Point point = new Point(); //create x y coordinate
+
+		public void DrowField(DrowDisplay[,] player, Point point)
 		{
 			int i, j, k;
 			for (i = 0; i < 2; i++)
@@ -128,36 +131,36 @@ namespace MorskoyBoy
 				Console.Write(display[i + 2, 1]);
 				for (j = 0; j < 10; j++)
 				{
-					Console.Write(drowSymbol[(int)player[i, j]]);
-					}
+					Console.Write(drowSymbol[(int) player[i, j]]);
+				}
 				for (j = 12; j < 17; j++)
 				{
 					Console.Write(display[i + 2, j]);
 				}
 				for (j = 0; j < 10; j++)
 				{
-					 // field 2
-					if (i == y && j == x)
+					// field 2
+					if (i == point.getY() && j == point.getX())
 					{
 						Console.Write(target);
 					}
 					else
 					{
-						Console.Write(" ");
+						//Console.Write(" ");
+						Console.Write(drowSymbol[(int) fieldTargetPlayer1[i, j]]);
 					}
 				}
 				Console.WriteLine(display[i + 2, 27]);
-		}
+			}
 
 			for (j = 0; j < 28; j++)
 			{
 				Console.Write(display[12, j]);
 			}
-			Console.Write(drowSymbol[(int) DrowDisplay.STRIKE]);
 		}
 
 
-		private int p;
+
 
 		public void StateGame()
 		{
@@ -168,24 +171,56 @@ namespace MorskoyBoy
 				{
 					case StateGameEnum.INIZIALIZATE:
 					{
-						  DrowShip(player1);
-							DrowShip(player2);
-							player1[0,0]= DrowDisplay.KILL;
-							one = StateGameEnum.DRAW;
+						DrowShip(player1);
+						TmpDrowShip2Player(player2);
+						player1[0, 0] = DrowDisplay.KILL;
+						//fieldTargetPlayer1[0, 0] = DrowDisplay.KILL;
+
+						one = StateGameEnum.DRAW;
 						break;
 					}
 					case StateGameEnum.DRAW:
 					{
-						DrowField(numberPlayer == 0 ? player1 : player2,x,y);
-						Console.ReadKey();
-						one = StateGameEnum.PROCESING;
+
+							Console.ForegroundColor = ConsoleColor.Green;
+							DrowField(numberPlayer == 0 ? player1 : player2, point);
+
+
+
+							if (numberPlayer == 0)
+						{
+							fieldTargetPlayer1[1, 2] = DrowDisplay.SHIP;
+						}
+						else
+						{
+							fieldTargetPlayer1[1, 2] = DrowDisplay.STRIKE;
+						}
+
+
+
+						if (TargetPosition(point))
+						{
+							if (FieldTarget(player2, fieldTargetPlayer1))
+							{
+									one = StateGameEnum.PROCESING;
+							}
+							
+
+
+
+							Console.ReadKey();
+							
+						}
 						Console.Clear();
-					break;
+						break;
 					}
 					case StateGameEnum.PROCESING:
-				{
-							numberPlayer = numberPlayer == 0 ? 1 : 0;
-							one = StateGameEnum.INIZIALIZATE;
+					{
+						numberPlayer = numberPlayer == 0 ? 1 : 0;
+						one = StateGameEnum.INIZIALIZATE;
+						point.x = 0;
+						point.y = 0;
+
 						break;
 					}
 					case StateGameEnum.EXIT:
@@ -200,31 +235,14 @@ namespace MorskoyBoy
 
 		public void DrowShip(DrowDisplay[,] player)
 		{
-			/*  12345678910 
-			 * 1$ $       
-			 * 2        $  
-			 * 3        S   
-			 * 4        S
-			 * 5 $      S
-			 * 6
-			 * 7    &
-			 * 8
-			 * 9
-			 * 10
-			 */
-
 			for (int i = 0; i < 10; i++)
 			{
 				for (int j = 0; j < 10; j++)
 				{
 					player[i, j] = DrowDisplay.EMPTY;
+				}
 			}
-		}
-
-
-
-
-	    player[0, 2] = DrowDisplay.SHIP;
+			player[0, 2] = DrowDisplay.SHIP;
 			player[0, 0] = DrowDisplay.SHIP;
 
 			player[2, 9] = DrowDisplay.SHIP;
@@ -243,21 +261,115 @@ namespace MorskoyBoy
 
 		}
 
-
-
-		void int Position(x, y, out z);
-		public void Position( int x, int y, out int z)
+		public void TmpDrowShip2Player(DrowDisplay[,] player)
 		{
-			x = 36;
-			z=y=25;
 
-			//return z;
+			for (int i = 0; i < 10; i++)
+			{
+				for (int j = 0; j < 10; j++)
+				{
+					player[i, j] = DrowDisplay.EMPTY;
+				}
+			}
+
+
+
+
+			player[0, 3] = DrowDisplay.SHIP;
+			player[0, 1] = DrowDisplay.SHIP;
+			player[0, 2] = DrowDisplay.SHIP;
+			player[0, 4] = DrowDisplay.SHIP;
+
+			player[3, 8] = DrowDisplay.SHIP;
+			player[3, 9] = DrowDisplay.SHIP;
+
+			player[1, 7] = DrowDisplay.SHIP;
+			player[3, 4] = DrowDisplay.SHIP;
+
+			player[8, 8] = DrowDisplay.SHIP;
+			player[8, 9] = DrowDisplay.SHIP;
+
+			player[3, 9] = DrowDisplay.SHIP;
+			player[4, 9] = DrowDisplay.SHIP;
+			player[5, 9] = DrowDisplay.SHIP;
+
+			player[1, 6] = DrowDisplay.SHIP;
+			player[9, 1] = DrowDisplay.SHIP;
+			player[4, 6] = DrowDisplay.SHIP;
+			player[5, 6] = DrowDisplay.SHIP;
+
+			player[5, 2] = DrowDisplay.SHIP;
+
+			player[7, 5] = DrowDisplay.SHIP;
+
 		}
-		
-		public void Sqr(ref int i)
+
+		public bool FieldTarget(DrowDisplay[,] player, DrowDisplay[,] fieldTarget)
 		{
-			i = i * i;
+			if (player[point.y, point.x] == DrowDisplay.EMPTY)
+			{
+				fieldTarget[point.y, point.x] = DrowDisplay.SHOT;
+				return true;
+			}
+			if (player[point.y, point.x] == DrowDisplay.SHIP)
+			{
+				fieldTarget[point.y, point.x] = DrowDisplay.STRIKE;
+			}
+
+			return false;
 		}
 
-	}
+		//public bool DrowField()
+	
+
+	//void int Position(x, y, out z);
+		public bool TargetPosition( Point point)
+		{
+			var isUp = Console.ReadKey().Key;
+			switch (isUp)
+			{
+				case ConsoleKey.UpArrow:
+					if (point.y > 0)
+					{
+						point.y--;
+					}
+					break;
+				case ConsoleKey.DownArrow:
+					if (point.y < 9)
+					{
+						point.y++;
+					}
+
+					
+					break;
+				case ConsoleKey.RightArrow:
+					if (point.x < 9)
+					{
+						point.x++;
+					}
+					break;
+				case ConsoleKey.LeftArrow:
+					if (point.x > 0)
+					{
+						point.x--;
+					}
+					break;
+				default:
+					Console.WriteLine("Default case");
+					break;
+
+				
+			}
+			
+			if (isUp == ConsoleKey.Enter)
+			{ Console.WriteLine("Enter");
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+
+		}
+}
 }
