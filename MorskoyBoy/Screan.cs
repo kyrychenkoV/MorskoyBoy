@@ -85,6 +85,7 @@ namespace MorskoyBoy
 			KILL,
 			SHIP,
 		}
+
 		enum StateGameEnum
 		{
 			INIZIALIZATE = 0,
@@ -92,6 +93,7 @@ namespace MorskoyBoy
 			PROCESING,
 			EXIT
 		}
+
 		StateGameEnum one = StateGameEnum.INIZIALIZATE;
 
 		private DrowDisplay[,] player1 = new DrowDisplay[10, 10];
@@ -129,7 +131,7 @@ namespace MorskoyBoy
 				Console.Write(display[i + 2, 1]);
 				for (j = 0; j < 10; j++)
 				{
-					Console.Write(drowSymbol[(int)player[i, j]]);
+					Console.Write(drowSymbol[(int) player[i, j]]);
 				}
 				for (j = 12; j < 17; j++)
 				{
@@ -145,7 +147,7 @@ namespace MorskoyBoy
 					else
 					{
 						//Console.Write(" ");
-						Console.Write(drowSymbol[(int)fieldTargetplayer[i, j]]);
+						Console.Write(drowSymbol[(int) fieldTargetplayer[i, j]]);
 					}
 				}
 				Console.WriteLine(display[i + 2, 27]);
@@ -166,61 +168,66 @@ namespace MorskoyBoy
 				switch (one)
 				{
 					case StateGameEnum.INIZIALIZATE:
-						{
-							DrowShip(player1);
-							TmpDrowShip2Player(player2);
-							player1[0, 0] = DrowDisplay.KILL;
-							//fieldTargetPlayer1[0, 0] = DrowDisplay.KILL;
-							one = StateGameEnum.DRAW;
-							break;
-						}
+					{
+						DrowShip(player1);
+						TmpDrowShip2Player(player2);
+
+						one = StateGameEnum.DRAW;
+						break;
+					}
 					case StateGameEnum.DRAW:
+					{
+						Console.ForegroundColor = ConsoleColor.Green;
+						if (numberPlayer == 0)
 						{
-							Console.ForegroundColor = ConsoleColor.Green;
-							if (numberPlayer == 0){DrowField(player1, point, fieldTargetPlayer1);}
-															  else{DrowField(player2, point, fieldTargetPlayer2);}
-							// при нажатии ентер (выстрел)
-							if (TargetPosition(point))
+							DrowField(player1, point, fieldTargetPlayer1);
+						}
+						else
+						{
+							DrowField(player2, point, fieldTargetPlayer2);
+						}
+						// при нажатии ентер (выстрел)
+						if (TargetPosition(point))
+						{
+							if (numberPlayer == 0)
 							{
-								if (numberPlayer == 0)
+								if (DrowFieldTarget(player2, fieldTargetPlayer1))
 								{
-									if (DrowFieldTarget(player2, fieldTargetPlayer1))
-									{
-										one = StateGameEnum.PROCESING;
-									}
-									else
-									{
-										Console.WriteLine("Продолжаем");
-									}
+									one = StateGameEnum.PROCESING;
 								}
 								else
 								{
-									if (DrowFieldTarget(player1, fieldTargetPlayer2))
-									{
-										one = StateGameEnum.PROCESING;
-									}
-									else
-									{
-										Console.WriteLine("Продолжаем");
-									}
+									Console.WriteLine("Продолжаем стрелять");
 								}
-								Console.ReadKey();
 							}
-							Console.Clear();
-							break;
+							else
+							{
+								if (DrowFieldTarget(player1, fieldTargetPlayer2))
+								{
+									one = StateGameEnum.PROCESING;
+								}
+								else
+								{
+									Console.WriteLine("Продолжаем стрелять");
+								}
+							}
+							Console.ReadKey();
 						}
+						Console.Clear();
+						break;
+					}
 					case StateGameEnum.PROCESING:
-						{
-							numberPlayer = numberPlayer == 0 ? 1 : 0;
-							one = StateGameEnum.INIZIALIZATE;
-							point.x = 0;
-							point.y = 0;
-							break;
-						}
+					{
+						numberPlayer = numberPlayer == 0 ? 1 : 0;
+						one = StateGameEnum.INIZIALIZATE;
+						point.x = 0;
+						point.y = 0;
+						break;
+					}
 					case StateGameEnum.EXIT:
-						{
-							break;
-						}
+					{
+						break;
+					}
 				}
 			}
 
@@ -238,10 +245,13 @@ namespace MorskoyBoy
 			player[0, 4] = DrowDisplay.SHIP;
 			player[0, 0] = DrowDisplay.SHIP;
 			player[0, 9] = DrowDisplay.SHIP;
+			player[1, 9] = DrowDisplay.SHIP;
+
+
 			player[5, 9] = DrowDisplay.SHIP;
 			player[9, 9] = DrowDisplay.SHIP;
 			player[9, 5] = DrowDisplay.SHIP;
-	    player[9, 0] = DrowDisplay.SHIP;
+			player[9, 0] = DrowDisplay.SHIP;
 			player[5, 0] = DrowDisplay.SHIP;
 
 			player[7, 3] = DrowDisplay.SHIP;
@@ -261,7 +271,7 @@ namespace MorskoyBoy
 					player[i, j] = DrowDisplay.EMPTY;
 				}
 			}
-	    player[0, 4] = DrowDisplay.SHIP;
+			player[0, 4] = DrowDisplay.SHIP;
 			player[0, 0] = DrowDisplay.SHIP;
 			player[0, 9] = DrowDisplay.SHIP;
 			player[5, 9] = DrowDisplay.SHIP;
@@ -289,117 +299,88 @@ namespace MorskoyBoy
 					return true;
 				case DrowDisplay.SHIP:
 					fieldTarget[point.y, point.x] = DrowDisplay.STRIKE;
-											//ОДНОПАЛУБНИК
+					//ОДНОПАЛУБНИК
 					//проверка на отсутствие в соседних полях корабля(центр екрана) 
 					if ((point.y - 1 > 0) && (point.y + 1 < 9) && (point.x - 1 > 0) && (point.x + 1 < 9))
 					{
 						if ((player[point.y - 1, point.x] != DrowDisplay.SHIP) &&
-								(player[point.y + 1, point.x] != DrowDisplay.SHIP) &&
-								(player[point.y, point.x - 1] != DrowDisplay.SHIP) &&
-								(player[point.y, point.x + 1] != DrowDisplay.SHIP))
+						    (player[point.y + 1, point.x] != DrowDisplay.SHIP) &&
+						    (player[point.y, point.x - 1] != DrowDisplay.SHIP) &&
+						    (player[point.y, point.x + 1] != DrowDisplay.SHIP))
 						{
 							for (int i = -1; i < 2; i++)
 							{
 								for (int j = -1; j < 2; j++)
 								{
-									fieldTarget[point.y + i, point.x+j] = DrowDisplay.SHOT;
+									fieldTarget[point.y + i, point.x + j] = DrowDisplay.SHOT;
 								}
 							}
 						}
-						fieldTarget[point.y, point.x] = DrowDisplay.KILL;// -1 однопалубник
+
+						fieldTarget[point.y, point.x] = DrowDisplay.KILL; // -1 однопалубник
 					}
 					else
 
-					{ // проверка на отсутствие корабля и отрисовка углов экрана
+					{
+
+						// проверка на отсутствие корабля и отрисовка углов экрана
 						//левый верхний
 						if ((point.y == 0) && (point.x == 0) && ((player[point.y + 1, point.x] != DrowDisplay.SHIP) &&
-																									(player[point.y, point.x + 1] != DrowDisplay.SHIP)))
+						                                         (player[point.y, point.x + 1] != DrowDisplay.SHIP)))
 						{
-							fieldTarget[point.y + 1, point.x] = DrowDisplay.SHOT;
-							fieldTarget[point.y + 1, point.x + 1] = DrowDisplay.SHOT;
-							fieldTarget[point.y, point.x + 1] = DrowDisplay.SHOT;
+							DrowArraundShip(fieldTarget);
 
-							fieldTarget[point.y, point.x] = DrowDisplay.KILL;
 							break;
 						} //правый верхний
-						if ((point.y == 0) && (point.x == 9) && ((player[point.y+1, point.x] != DrowDisplay.SHIP) &&
-																									  (player[point.y, point.x - 1] != DrowDisplay.SHIP)))
+						if ((point.y == 0) && (point.x == 9) && ((player[point.y + 1, point.x] != DrowDisplay.SHIP) &&
+						                                         (player[point.y, point.x - 1] != DrowDisplay.SHIP)))   /*FindShipArraund(player))*/
 						{
-							fieldTarget[point.y + 1, point.x] = DrowDisplay.SHOT;
-							fieldTarget[point.y + 1, point.x-1] = DrowDisplay.SHOT;
-							fieldTarget[point.y, point.x-1] = DrowDisplay.SHOT;
 
-							fieldTarget[point.y, point.x] = DrowDisplay.KILL;
+							DrowArraundShip(fieldTarget);
 							break;
 						}
 						//правый нижний
 						if ((point.y == 9) && (point.x == 9) && ((player[point.y - 1, point.x] != DrowDisplay.SHIP) &&
-																										 (player[point.y, point.x - 1] != DrowDisplay.SHIP)))
+						                                         (player[point.y, point.x - 1] != DrowDisplay.SHIP)))
 						{
-							fieldTarget[point.y - 1, point.x] = DrowDisplay.SHOT;
-							fieldTarget[point.y - 1, point.x - 1] = DrowDisplay.SHOT;
-							fieldTarget[point.y, point.x - 1] = DrowDisplay.SHOT;
-
-							fieldTarget[point.y, point.x] = DrowDisplay.KILL;
+							DrowArraundShip(fieldTarget);
 							break;
 						}
 						//левый нижний
 						if ((point.y == 9) && (point.x == 0) && ((player[point.y - 1, point.x] != DrowDisplay.SHIP) &&
-																										 (player[point.y, point.x+1] != DrowDisplay.SHIP)))
+						                                         (player[point.y, point.x + 1] != DrowDisplay.SHIP)))
 						{
-							fieldTarget[point.y - 1, point.x] = DrowDisplay.SHOT;
-							fieldTarget[point.y - 1, point.x + 1] = DrowDisplay.SHOT;
-							fieldTarget[point.y, point.x + 1] = DrowDisplay.SHOT;
-
-							fieldTarget[point.y, point.x] = DrowDisplay.KILL;
+							DrowArraundShip(fieldTarget);
 							break;
 						}
 						// проверка на отсутствие в соседних полях корабля(верху внизу справа слева экрана)
 						if ((point.y - 1 < 0) && ((player[point.y + 1, point.x] != DrowDisplay.SHIP) &&
-																		(player[point.y, point.x - 1] != DrowDisplay.SHIP) &&
-																		(player[point.y, point.x + 1] != DrowDisplay.SHIP)))
+						                          (player[point.y, point.x - 1] != DrowDisplay.SHIP) &&
+						                          (player[point.y, point.x + 1] != DrowDisplay.SHIP)))
 						{
-							fieldTarget[point.y + 1, point.x] = DrowDisplay.SHOT;
-							fieldTarget[point.y + 1, point.x + 1] = DrowDisplay.SHOT;
-							fieldTarget[point.y + 1, point.x - 1] = DrowDisplay.SHOT;
-							fieldTarget[point.y, point.x - 1] = DrowDisplay.SHOT;
-							fieldTarget[point.y, point.x + 1] = DrowDisplay.SHOT;
+							DrowArraundShip(fieldTarget);
 
 						}
 						if ((point.y + 1 > 9) && ((player[point.y - 1, point.x] != DrowDisplay.SHIP) &&
-																			(player[point.y, point.x - 1] != DrowDisplay.SHIP) &&
-																			(player[point.y, point.x + 1] != DrowDisplay.SHIP)))
+						                          (player[point.y, point.x - 1] != DrowDisplay.SHIP) &&
+						                          (player[point.y, point.x + 1] != DrowDisplay.SHIP)))
 						{
-
-							fieldTarget[point.y - 1, point.x] = DrowDisplay.SHOT;
-							fieldTarget[point.y - 1, point.x + 1] = DrowDisplay.SHOT;
-							fieldTarget[point.y - 1, point.x - 1] = DrowDisplay.SHOT;
-							fieldTarget[point.y, point.x - 1] = DrowDisplay.SHOT;
-							fieldTarget[point.y, point.x + 1] = DrowDisplay.SHOT;
+							DrowArraundShip(fieldTarget);
 
 						}
 						if ((point.x - 1 < 0) && ((player[point.y + 1, point.x] != DrowDisplay.SHIP) &&
-																			(player[point.y - 1, point.x] != DrowDisplay.SHIP) &&
-																			(player[point.y, point.x + 1] != DrowDisplay.SHIP)))
+						                          (player[point.y - 1, point.x] != DrowDisplay.SHIP) &&
+						                          (player[point.y, point.x + 1] != DrowDisplay.SHIP)))
 						{
-							fieldTarget[point.y + 1, point.x] = DrowDisplay.SHOT;
-							fieldTarget[point.y - 1, point.x] = DrowDisplay.SHOT;
-							fieldTarget[point.y + 1, point.x + 1] = DrowDisplay.SHOT;
-							fieldTarget[point.y - 1, point.x + 1] = DrowDisplay.SHOT;
-							fieldTarget[point.y, point.x + 1] = DrowDisplay.SHOT;
+							DrowArraundShip(fieldTarget);
 						}
 
 						if ((point.x + 1 > 9) && ((player[point.y + 1, point.x] != DrowDisplay.SHIP) &&
-																			(player[point.y - 1, point.x] != DrowDisplay.SHIP) &&
-																			(player[point.y, point.x - 1] != DrowDisplay.SHIP)))
+						                          (player[point.y - 1, point.x] != DrowDisplay.SHIP) &&
+						                          (player[point.y, point.x - 1] != DrowDisplay.SHIP)))
 						{
-							fieldTarget[point.y + 1, point.x] = DrowDisplay.SHOT;
-							fieldTarget[point.y - 1, point.x] = DrowDisplay.SHOT;
-							fieldTarget[point.y + 1, point.x - 1] = DrowDisplay.SHOT;
-							fieldTarget[point.y - 1, point.x - 1] = DrowDisplay.SHOT;
-							fieldTarget[point.y, point.x - 1] = DrowDisplay.SHOT;
+							DrowArraundShip(fieldTarget);
 						}
-						Console.WriteLine("Карабль за пределами");
 						fieldTarget[point.y, point.x] = DrowDisplay.KILL; // -1 однопалубник
 					}
 					break;
@@ -407,8 +388,51 @@ namespace MorskoyBoy
 			return false;
 		}
 
+		private void DrowArraundShip(DrowDisplay[,] fieldTarget)
+		{
+			for (int i = -1; i < 2; i++)
+			{
+				for (int j = -1; j < 2; j++)
+				{
 
-		public bool TargetPosition(Point point)
+					if ((point.y + i >= 0) && (point.y + i <= 9) && (point.x + j >= 0) && (point.x + j <= 9))
+					{
+
+						fieldTarget[point.y + i, point.x + j] = DrowDisplay.SHOT;
+
+					}
+					else
+					{
+						continue;
+					}
+				}
+			}
+			fieldTarget[point.y, point.x] = DrowDisplay.KILL;
+		}
+
+		private bool FindShipArraund(DrowDisplay[,] player)
+		{
+			for (int i = -1; i < 2; i += 2)
+			{
+				for (int j = -1; j < 2; j += 2)
+				{
+					if ((point.y + i >= 0) && (point.y + i <= 9) && (point.x + j >= 0) && (point.x + j <= 9))
+					{
+						if (player[point.y + i, point.x + j] != DrowDisplay.SHIP)
+						{
+							return true;
+						}
+						else
+					{
+						continue;
+					}
+				}
+			}
+		}
+			return false;
+		}
+
+public bool TargetPosition(Point point)
 		{
 			var isUp = Console.ReadKey().Key;
 			switch (isUp)
